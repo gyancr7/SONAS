@@ -5,13 +5,14 @@ import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import spopo.sonas.MainActivity;
 import spopo.sonas.R;
 
 /**
  * Created by Luca on 4/20/2016.
  */
 public class SoundManager {
-    private static final double HALF_HEAD_SPACE = 20;
+    private static final double HALF_HEAD_SPACE = MainActivity.THRESHOLD_MAP_OBJECT_DISTANCE;
     private static MediaPlayer mediaplayer;
     private static MapObject source; //Also cares about velocity for future doppler effect.
     private static MapObject destination;
@@ -34,15 +35,29 @@ public class SoundManager {
         SoundManager.source = source;
         SoundManager.destination = destination;
         mediaplayer.reset();
-        AssetFileDescriptor afd = context.getResources().openRawResourceFd(track);
-        if (afd == null) throw new Exception("The track provided failed to load.");
-        mediaplayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-        afd.close();
-        mediaplayer.prepare();
-        //mediaplayer = MediaPlayer.create(context, R.raw.track1);
+        mediaplayer.release(); //TODO: Reuse the object
+//        AssetFileDescriptor afd = context.getResources().openRawResourceFd(track);
+//        if (afd == null) throw new Exception("The track provided failed to load.");
+//        mediaplayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+//        afd.close();
+  //      mediaplayer.prepare();
+        mediaplayer = MediaPlayer.create(context, track);
         update();
         mediaplayer.setLooping(true);
         mediaplayer.start();
+        Log.i("Sonas", "Set called for SoundManager.");
+    }
+    public static void stop() {
+        mediaplayer.stop();
+    }
+
+    public static void play(int track) {
+        mediaplayer.reset();
+        mediaplayer.release();
+        mediaplayer = MediaPlayer.create(context, track);
+        mediaplayer.setLooping(false);
+        mediaplayer.start();
+        mediaplayer.setVolume(1, 1);
     }
 
     public static void update() {
@@ -60,8 +75,10 @@ public class SoundManager {
         r_dist = ear.distance(source.position);
 
         //TODO: Apply transformations
-        l_vol = 1 / (1+l_dist);
-        r_vol = 1 / (1+r_dist);
+        //l_vol = Math.max(0, 1 - (float)Math.abs(0.5*Math.log10(l_dist)));
+        //r_vol = Math.max(0, 1 - (float)Math.abs(0.5*Math.log10(r_dist)));
+        l_vol = 1/(1+l_dist);
+        r_vol = 1/(1+r_dist);
 
         mediaplayer.setVolume(l_vol, r_vol);
         Log.i("Sonas", "Volumes: "+l_vol+", "+r_vol);

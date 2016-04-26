@@ -7,6 +7,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import spopo.sonas.MainActivity;
+import spopo.sonas.menu.Menu;
+import spopo.sonas.menu.MenuItem;
 
 /**
  * Created by Luca on 4/20/2016.
@@ -15,21 +17,31 @@ public class Map implements Runnable {
     private static Target target;
     private static Player player;
     private static int score;
-    private static float timeLeft;
+    private static float timeLeft = MainActivity.TARGTIME;
     private static int track = 0;
     private static int[] tracks;
     private static double stamp;
+    private static Map mapobj;
     private static ScheduledThreadPoolExecutor scheduler;
     public static void init(Context context) {
         scheduler = new ScheduledThreadPoolExecutor(1);
         target = new Target(0,0);
         player = new Player(0, 0);
         Map.tracks = MainActivity.MUSIC_TRACKS;
-        SoundManager.init(context);
+
         newTarget();
-        scheduler.scheduleAtFixedRate(new Map(), 0, 100, TimeUnit.MILLISECONDS);
+        if (mapobj == null) {mapobj = new Map();}
+        scheduler.scheduleAtFixedRate(mapobj, 0, 100, TimeUnit.MILLISECONDS);
     }
+
+    public  static  void stop() {
+        scheduler.remove(mapobj);
+        scheduler.purge();
+        SoundManager.stop();
+    }
+
     public static void changeTrack() {
+        tracks = MainActivity.MUSIC_TRACKS;
         int ntrack = (int) (Math.random() * (tracks.length-1));
         if (ntrack>=track) {
             track = ntrack + 1;
@@ -46,7 +58,7 @@ public class Map implements Runnable {
         target.setPosition((float)Math.cos(theta)*r,(float) Math.sin(theta)*r);
         changeTrack();
         try {
-            SoundManager.set(target, player, track);
+            SoundManager.set(target, player, MainActivity.MUSIC_TRACKS[ track ]);
         }
         catch (Exception exc) {
             Log.e("Sonas", exc.toString());
@@ -65,13 +77,15 @@ public class Map implements Runnable {
         Log.i("Sonas", "Distance: " + player.position.distance(target.position));
         if (player.position.distance(target.position) < MainActivity.THRESHOLD_MAP_OBJECT_DISTANCE) {
             score++;
-            timeLeft+=60000; //TODO: Dynamic, or at least not magic
+            timeLeft+=MainActivity.TARGTIME; //TODO: Dynamic, or at least not magic
             newTarget();
         }
         timeLeft-=time;
+        Log.i("Sonas", "Time Left: "+timeLeft);
+        if (timeLeft < 0) { stop();};
     }
     public static void setPlayerInput(float x, float y) {
-        player.setVelocity(x, y);
+        if (player!=null) {player.setVelocity(x, y); }
     }
     public static void setPlayerInput(Pair val) {
         Map.setPlayerInput(val.x, val.y);

@@ -32,16 +32,25 @@ public class Menu implements DribbleCounter.onDribbleComplete, MenuItem {
         counter = new DribbleCounter(500, this);
         child = null;
         //counter.dribble();
+        if (mediaPlayer!=null) {
+            try {
+                mediaPlayer.stop();
+            } catch (Exception e) {}
+            try {
+                mediaPlayer.release();
+            } catch (Exception e) {}
+        }
         mediaPlayer = MediaPlayer.create(context, titleSound);
         mediaPlayer.start();
     }
-    public void onSelected (Menu callingMenuItem) {
+    public boolean onSelected (Menu callingMenuItem) {
         prev = callingMenuItem;
         prev.child = this;
         prompt();
+        return true;
     }
     public boolean onCancel () {
-        if (child != null) {
+        if (this.child != null) {
             return child.onCancel();
         }
         if (mediaPlayer!=null) {
@@ -72,7 +81,9 @@ public class Menu implements DribbleCounter.onDribbleComplete, MenuItem {
             this.prompt();
         }
         else {
-            items[count - 1].onSelected(this);
+            if (!items[count - 1].onSelected(this)) {
+               // this.onCancel();
+            }
         }
     }
     public static void bump() {
