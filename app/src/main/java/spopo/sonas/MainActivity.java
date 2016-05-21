@@ -20,11 +20,11 @@ import spopo.sonas.play.SoundManager;
 public class MainActivity extends Activity implements View.OnClickListener, SensorEventListener {
 
     public static float THRESHOLD_MAP_OBJECT_DISTANCE = 3;
-    public static final int[]  MUSIC_TRACKS = new int[3];
+    public static final int[]  MUSIC_TRACKS = new int[2];
     //public static final int[] PROMPTSOUNDS = new int[4];
     public static final float MAX_TARGET_DISTANCE = 30;
     public static final float MIN_TARGET_DISTANCE = 10;
-    public static final float TARGTIME = 60000;
+    public static final float TARGTIME = 120000;
     public static final float DRAG = 0.05f;
     public static Menu mainMenu;
     private boolean playflag;
@@ -49,10 +49,10 @@ public class MainActivity extends Activity implements View.OnClickListener, Sens
 
        View view = new View(context);
        setContentView(view);
-       MUSIC_TRACKS[0] = R.raw.track1;
-       MUSIC_TRACKS[1] = R.raw.hyouri;
+       MUSIC_TRACKS[0] = R.raw.tr1;
+       MUSIC_TRACKS[1] = R.raw.tr2;
        //MUSIC_TRACKS[3] = R.raw.uzu;
-       MUSIC_TRACKS[2] = R.raw.shianchuu;
+       //MUSIC_TRACKS[2] = R.raw.shianchuu;
        view.setOnClickListener(this);
        SoundManager.init(context);
        //Map.init(context);

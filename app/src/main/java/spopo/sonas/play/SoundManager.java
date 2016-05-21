@@ -77,8 +77,8 @@ public class SoundManager {
         //TODO: Apply transformations
         //l_vol = Math.max(0, 1 - (float)Math.abs(0.5*Math.log10(l_dist)));
         //r_vol = Math.max(0, 1 - (float)Math.abs(0.5*Math.log10(r_dist)));
-        l_vol = 1/(1+l_dist);
-        r_vol = 1/(1+r_dist);
+        l_vol = 10/(10+l_dist);
+        r_vol = 10/(10+r_dist);
 
         mediaplayer.setVolume(l_vol, r_vol);
         Log.i("Sonas", "Volumes: "+l_vol+", "+r_vol);

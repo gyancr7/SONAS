@@ -24,6 +24,7 @@ public class Map implements Runnable {
     private static Map mapobj;
     private static ScheduledThreadPoolExecutor scheduler;
     public static void init(Context context) {
+        timeLeft = MainActivity.TARGTIME;
         scheduler = new ScheduledThreadPoolExecutor(1);
         target = new Target(0,0);
         player = new Player(0, 0);
